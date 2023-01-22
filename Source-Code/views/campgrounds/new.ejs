@@ -1,0 +1,73 @@
+<% layout('layouts/boilerplate.ejs') %>
+<div class="row">
+    <h1 class="text-center">Add new Campground</h1>
+    <div class="col-md-4 offset-4 mb-5">
+        <form class="needs-validation" action="/campgrounds" method="POST" novalidate>
+            <div class="mb-3">
+                <label class="form-label" for="title">Enter the Campgorund Name: </label>
+                <input class="form-control" type="text" id="title" name="campground[title]" required>
+                <div class="valid-feedback">
+                    looks Good!
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="location">Enter the Campgorund Location: </label>
+                <input class="form-control" type="text" id="location" name="campground[location]" required>
+                <div class="valid-feedback">
+                    looks Good!
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="image-url">Enter the Campgorund Image url: </label>
+                <input class="form-control" type="text" id="image-url" name="campground[image]" required>
+                <div class="valid-feedback">
+                    looks Good!
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="description">Enter the Campgorund description: </label>
+                <textarea class="form-control" type="text" id="description" name="campground[description]" required></textarea>
+                <div class="valid-feedback">
+                    looks Good!
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="price">Price: </label>
+                <div class="input-group">
+                    <span class="input-group-text" id="basic-price">$</span>
+                    <input type="text" class="form-control" placeholder="0.00" name="campground[price]" aria-label="Price" aria-describedby="basic-price" required>
+                    <div class="valid-feedback">
+                        looks Good!
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-success">Add Campground</button>
+        </form>
+    
+    </div>
+</div>    
+<footer>
+    <a href="/campgrounds">Show All campgrounds</a>
+</footer>
+
+<!-- Moving the below script for bootstrap client side validation to boiler plate for easy access -->
+<!-- <script>
+    (() => {
+  'use strict'
+
+  // Fetch all the forms we want to apply custom Bootstrap validation styles to
+  const forms = document.querySelectorAll('.needs-validation')
+
+  // Loop over them and prevent submission
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+
+      form.classList.add('was-validated')
+    }, false)
+  })
+})()
+</script> -->
