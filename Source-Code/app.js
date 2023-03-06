@@ -6,9 +6,10 @@ const Joi = require('joi'); //Js schema validator tool
 const bodyParser = require('body-parser');
 const catchAsync = require('./utils/catchAsync.js'); //this brings us the custom async error handler
 const ExpressError = require('./utils/ExpressError');
-const {campgroundSchema} = require('./utils/joiSchemaValidator'); //this brings the joi schema validator
+const {campgroundSchema, reviewSchema} = require('./utils/joiSchemaValidator'); //this brings the joi schema validator
 const methodOverride = require('method-override');
 const ejsMate = require('ejs-mate'); //this is ejs engine used for simplifying partials.
+const Review = require('./models/review.js'); //Getting the Review Model.
 
 //requiring custom files from the working directory
 const Campground = require('./models/campground.js');
@@ -70,6 +71,18 @@ const validateSchema = (req,res,next)=>{
     }
 }
 
+//Joi validation middleware to do schema validation of review...
+const validateReviewSchema = (req,res,next) =>{
+    const {error} = reviewSchema.validate(req.body);
+
+    if(error) {
+        const msg = error.details.map(err => err.message).join(',');
+        throw new ExpressError(msg, 400);
+    } else {
+        next();
+    }
+}
+
 //This handles validation if the body dont have a campground data...
 app.post('/campgrounds',validateSchema, catchAsync( async(req,res,next)=>{
     //console.log(req.body); //just to view the submitted data
@@ -81,9 +94,20 @@ app.post('/campgrounds',validateSchema, catchAsync( async(req,res,next)=>{
 
 //baisc show-route, detail of one campground.
 app.get('/campgrounds/:id', catchAsync( async(req,res)=>{
-    const campground = await Campground.findById(req.params.id);
+    const campground = await Campground.findById(req.params.id).populate('reviews');
     //console.log(campground);
     res.render('campgrounds/show.ejs', {campground});
+}))
+
+//Handling Post Review Routes.. (Handling the Review-campground Scheama relations here...)
+app.post('/campgrounds/:id/reviews', validateReviewSchema, catchAsync(async(req,res)=>{
+    //res.send({...req.body.review});
+    const campground = await Campground.findById(req.params.id);
+    const newReview = new Review({...req.body.review});
+    campground.reviews.push(newReview);
+    await newReview.save();
+    await campground.save();
+    res.redirect(`/campgrounds/${req.params.id}`);
 }))
 
 //edit route..
@@ -103,13 +127,24 @@ app.put('/campgrounds/:id',validateSchema, catchAsync( async(req,res)=>{
 
 //campground delete route...
 app.delete('/campgrounds/:id', catchAsync( async(req,res)=>{
+    //res.send("Yes this will be Deleted !!");
     const{id} = req.params;
     await Campground.findByIdAndDelete(id);
     res.redirect('/campgrounds');
 }))
 
+//handling Delete A particular Review Route..
+app.delete('/campgrounds/:id/reviews/:reviewId', catchAsync(async(req,res)=>{
+    //res.send("Yes this will be Deleted !!");
+    const {id, reviewId} = req.params;
+    await Campground.findByIdAndUpdate(id, {$pull: {reviews: reviewId}}); //This will pull one review that matches from the reviews list and remove it.
+    await Review.findByIdAndDelete(reviewId);
+    res.redirect(`/campgrounds/${id}`);
+}))
+
 //A default route for catching a route that doesn't exist
 app.all('*', (req,res,next)=>{
+    console.log("None of the Routes Matched !!");
     return next(new ExpressError('Page not found', 404));
 })
 
