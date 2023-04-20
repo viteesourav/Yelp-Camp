@@ -6,22 +6,49 @@ const Joi = require('joi'); //Js schema validator tool
 const bodyParser = require('body-parser');
 const catchAsync = require('./utils/catchAsync.js'); //this brings us the custom async error handler
 const ExpressError = require('./utils/ExpressError');
-const {campgroundSchema, reviewSchema} = require('./utils/joiSchemaValidator'); //this brings the joi schema validator
 const methodOverride = require('method-override');
 const ejsMate = require('ejs-mate'); //this is ejs engine used for simplifying partials.
-const Review = require('./models/review.js'); //Getting the Review Model.
+const session = require('express-session'); // handles the session realted stuff.
+const flash = require('connect-flash'); //this handles flash messages.
+
 
 //requiring custom files from the working directory
 const Campground = require('./models/campground.js');
+const Review = require('./models/review.js'); //Getting the Review Model.
 
 //app configurations..
 mongoose.set('strictQuery', true); //suppress the warning...
 app.engine('ejs', ejsMate); //this defines the ejs engine to use ejs-mate instead of the default one.
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+//Middleware-configurations
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(methodOverride('_method'));
+
+//enabling session
+app.use(session({
+    secret: 'ThisMySecretKeyForSessionSign',  //Required Parameter for session
+    resave:false,
+    saveUninitialized:true,
+    cookie: {
+        httpOnly: true,
+        maxAge: 1000*60*60*24*7, //this sets the max age of the session to 1 week. (takes in millisecond)
+    }
+}))
+//enabling flash..
+app.use(flash());
+//defining flash-middleware to make sure it renders the messages.
+app.use((req,res,next)=>{
+    res.locals.success = req.flash('success');  //res.locals defines params that goes straight to the render form.
+    res.locals.error = req.flash('error');
+    next();
+})
+
+
+//we will server the static public directory
+app.use(express.static(path.join(__dirname, 'public')));
 
 //mongoose configurations...
 mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp')
@@ -45,102 +72,14 @@ app.get('/insertDummy', catchAsync(async (req, res)=>{
     res.send('Dummy Camp inserted in the DB');
 }))
 
-//basic Routing, home-page for campground.
-app.get('/campgrounds', catchAsync( async(req,res)=>{
-    const response = await Campground.find({});
-    res.render('campgrounds/index.ejs', {campgrounds: response});
-}));
 
-//basic create route..
-app.get('/campgrounds/new', (req,res)=>{
-    console.log('Opening create new campground page');
-    res.render('campgrounds/new.ejs');
-})
+//importing and implementing required Routers...
+const CampgroundRouters = require('./router/campground');
+app.use('/campgrounds', CampgroundRouters);
 
-//Joi validator handler middleware to mongoose schema vlaidation...
-const validateSchema = (req,res,next)=>{
-    //using js schema validator... 
-    const {error} = campgroundSchema.validate(req.body);  //validating the incoming data from the form.
-    //console.log(error);
-    if(error) {
-        //console.log(error.details);  --> this returns a list of objects contianing info about the schema error encountered.
-        const msg = error.details.map(err => err.message).join(','); //this is how you extract the message from JOI error object.
-        throw new ExpressError(msg, 400);  //also can be written like: return next(new ExpressError(msg, 400));
-    } else {
-        next();
-    }
-}
+const ReviewRouters = require('./router/review');
+app.use('/campgrounds/:id/reviews', ReviewRouters);  //Dont forgot to pass the param in Router defination, so that it will treat :id as path param.
 
-//Joi validation middleware to do schema validation of review...
-const validateReviewSchema = (req,res,next) =>{
-    const {error} = reviewSchema.validate(req.body);
-
-    if(error) {
-        const msg = error.details.map(err => err.message).join(',');
-        throw new ExpressError(msg, 400);
-    } else {
-        next();
-    }
-}
-
-//This handles validation if the body dont have a campground data...
-app.post('/campgrounds',validateSchema, catchAsync( async(req,res,next)=>{
-    //console.log(req.body); //just to view the submitted data
-    //if(!req.body.campground) throw new ExpressError('Invalid campground-form Data', 400); 
-    const newCamp = new Campground(req.body.campground);
-    await newCamp.save();
-    res.redirect(`/campgrounds/${newCamp._id}`);
-}))
-
-//baisc show-route, detail of one campground.
-app.get('/campgrounds/:id', catchAsync( async(req,res)=>{
-    const campground = await Campground.findById(req.params.id).populate('reviews');
-    //console.log(campground);
-    res.render('campgrounds/show.ejs', {campground});
-}))
-
-//Handling Post Review Routes.. (Handling the Review-campground Scheama relations here...)
-app.post('/campgrounds/:id/reviews', validateReviewSchema, catchAsync(async(req,res)=>{
-    //res.send({...req.body.review});
-    const campground = await Campground.findById(req.params.id);
-    const newReview = new Review({...req.body.review});
-    campground.reviews.push(newReview);
-    await newReview.save();
-    await campground.save();
-    res.redirect(`/campgrounds/${req.params.id}`);
-}))
-
-//edit route..
-app.get('/campgrounds/:id/edit', catchAsync( async(req,res)=>{
-    const campground = await Campground.findById(req.params.id);
-    res.render('campgrounds/edit.ejs', {campground});
-}))
-
-//validating the input using joi schema validator...
-app.put('/campgrounds/:id',validateSchema, catchAsync( async(req,res)=>{
-    const {id} = req.params;
-    //console.log(req.params);
-    const campground = await Campground.findByIdAndUpdate(id, {...req.body.campground}); //using spread operator..
-    console.log('Updated Data: ', campground);
-    res.redirect(`/campgrounds/${id}`);
-}))
-
-//campground delete route...
-app.delete('/campgrounds/:id', catchAsync( async(req,res)=>{
-    //res.send("Yes this will be Deleted !!");
-    const{id} = req.params;
-    await Campground.findByIdAndDelete(id);
-    res.redirect('/campgrounds');
-}))
-
-//handling Delete A particular Review Route..
-app.delete('/campgrounds/:id/reviews/:reviewId', catchAsync(async(req,res)=>{
-    //res.send("Yes this will be Deleted !!");
-    const {id, reviewId} = req.params;
-    await Campground.findByIdAndUpdate(id, {$pull: {reviews: reviewId}}); //This will pull one review that matches from the reviews list and remove it.
-    await Review.findByIdAndDelete(reviewId);
-    res.redirect(`/campgrounds/${id}`);
-}))
 
 //A default route for catching a route that doesn't exist
 app.all('*', (req,res,next)=>{
