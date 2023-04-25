@@ -1,0 +1,128 @@
+***Building a fully functional Website including Servers and interactive UI using all important concepts of WEB-DEV-Fundamentals***
+
+Important NOteS:
+
+**Setting up the basic Routes and Templates for the project**
+    -- Make the project modular, Try with basic route and keep the model and seed files seperate.
+    -- To include partials in your dynamic HTML template, we can use a package called ejs-mate.
+    **ejs-mate**
+    -- ejs-mate is better and efficent than using partials for templating duplicate things in project.
+    -- add the npm package, add the app.engine for ejs to ejs-mate. define boilerplate.ejs with the dynamic body tag.
+    -- we define a boilerplate template and then whenever you call layout('boilerPlate location') in one form, it is passed to the <%- body %> area of the boiler plate template.
+    -- textArea --> Dont have a value attribute.
+    -- in bootstrap, class="col-md-4 offset-4 mb-5", means you will occupy 4 md columns out of 12 and adding offset will start it after the starting 4 columns.
+    -- in form, class= "d-inline", will push the form to get inline with the rest of the content.
+
+*******************************************************************************************************************************************************************************************************    
+NOTE(Just something that needed to be very clear):
+    -- JS by nature runs sync, means runs the code line by line, top to bottom.
+    -- if a function is async it means, anything after that function will run immediately.
+    -- async funs always return a promise object, which is either resolved or failure based on the nature of the response.
+    -- inside the async fun, if we have multiple calls to db, or file or api, we can use await function, it will await for the response to come and then move to the next server call.
+    -- That is why we use await only inside async funcs, to wait for the response of the server call.
+    -- eg: setTimeout is a built-in async call, it runs the callback back function after the specified time, but won't block other function written after it. those will run anyway.
+        After the specified time, automatically, the response will be printed out. Thus Async Functions are powerful Functions :> RESPECT THEM !
+*******************************************************************************************************************************************************************************************************    
+
+**Including Server-side and client Side validations**
+    
+    -- Client-side validation options available, we can use the html 5 inline 'required' keyword to do the validations (handled by the browser) or can use the bootstarp validation class (makes more sense and looks nice too).
+    -- use the bootstrap validations to do the client side validations.
+    -- Note: using novalidate in form as attribute will ignore any required added for any input.
+    
+    -- Server-side validation, we need to handle mongoose error and middleware errors.
+    -- add the custom error-handler class, add a util folder, with custom ExpressError fun and the wraperAsync catch function(this will catch error inside async functions).
+    Note: 
+    if you use app.all('*', (req,res,next)=>{...}) --> this will trigger if none of the top route matched. (It has to be at the end, because route order is important).
+    -- declare custom error handler and throw error whereever required to handler possible mongoose error or req body or param error etc.
+    
+    -- For schema validation, we will use Joi schema valiation, put it as a middleware function and call it before the route callbacks of post and edit.
+    -- if this middleware throws an error, the default custom middleware at the end will catch it and process it.
+
+**Adding Review Model for Our Yelp-camp**
+    -- New Review Schema is add. 
+    -- Review and Campground schema will have one to many Relationship. single campground can have mulitple reviews.
+    -- make sure before writing the route call, What will be the best url for that route. eg: Since i need to store camp details also while svaing a review, Route should have the campground id.
+    -- client side validation is needed, using botstrap validation method and form level validations.
+    -- server side, add a Joi Schema validation and async middleware to catch any error in the from schema or during any mongoose operations.
+    
+    ****VEry Important, Very useful****
+    -- For Deleting Review functionality, we are going to use a Mongoose operator $Pull, it can remove any matching value from an array that satisfys the conditions, Syntax: { $pull: { <field1>: <value|condition>, <field2>: <value|condition>, ... } }
+    ***********************************
+    -- Another Situation: If a campground is deleted, then whole List of comments associated with it also needs to delete.
+    -- campground delete middleware,
+    
+**Restructuring the Campgroud index.js and Adding cookies and Sessions**
+    -- we Have shited all the Campgrounds related routes to one seperate folder with all the required dependencies.
+    -- we Have shited all the Review related routes to one seperate folder with all the required dependencies.
+        NOTE: **Very Important**
+        -- In review related routes, as prefix we will be sending campID as path param 
+        -- For Express Router to treat it as path param, we must pass one param while defining Router.
+        -- eg: const Router = express.Router({mergeParmas: true});                
+    
+        -- Next we have to manage our static elements including breaking down the boiler scripts and put a public folder and serve it using express.Static().
+    -- NOTE: If you are serving a folder using express.static like views and public, the entire content of the folder is served and you can directly used without mentioning the dir path.
+
+    -- Configuring session and Flash
+        -- For now we will be using the local memory session store. Later we will move it to mongo.
+        -- we will send some cookie paramter also like expire, maxAge(in millisecond) and httpOnly (Extra security that saves from accidental reveal of cookies to 3rd party) --> refer the express Documentation.
+        -- setup connect-flash and flash middleware to make use of flash messages on actions.
+        -- flash partials for success and error alerts Done.
+*******************************************************************************************************************************************************************************************************
+
+**Adding Authentication And Authorization into the APP**
+
+Authentication using Passport: (Passport middleware for NOde JS)
+    Why ? 
+        -- It hides most of the implementation logic of Authentication.
+        -- It grows with your app, And has easy accessibility to other strategies of login like local strategy, google login, facebook login etc.
+        -- It is faster to implement.
+    NPM Packages we are using: 
+        -- passport - the main package needed for passport implementation.
+        -- passport-local - It's used for simple username and password authentication.
+        -- passport-local-mongoose 
+            - local authentication implementation simplified using mongoose, It handles the username and passowrd in local authentication.
+            - To the existing schema. it adds username, hashed password and salt.
+            - Also it provides a bunch of methods for handling authentication.
+1) For Registering the User details in the DB:
+    -- In the model file, You just need plugin passport-local-mongoose into the schema Object.
+    -- We need to use passport.session always after the app.session [IMP]
+    -- Now we need to register the user with an userObj and password. This uses a different password hashing method and stores the data along with salt and hashed password.
+    NOTE: .register static method
+    -- It is a static method added by passport-local-mongoose in the Schema file. Scheam Object will have access to register method.
+    -- Register will also save the data in the db. [V.IMP]
+    -- Also it do validation on the username, If the same username exists.
+    To handle the Login When an user is just registered ?
+    -- req.login() -> passport helper method that do the authentication and made the user availble for the session.
+    
+    All the above is to just Get an Valiate user to Register and store in the DB. NOw we need to make sure the Login works... 
+2) For Login in APP:
+    -- Passpert provide a middleware to authenticate the user trying to login. -> passport.authenticate('local', {Options}) [defined local for the type of login we are handling..] 
+    -- It provides 2 options
+    failureFlash -> bool that shows a popup
+    failureRedirect -> take's a redirect path in case of login failure.
+3) Handle session for the loggedin User:
+    -- req.isAuthenticated() -> It can help checks if the user is present in the session or not ?
+    -- this method is a availble for req. [IMP]
+    -- Added it as a middleware to Protect all the Routes we have.
+4) Implementing LogOut:
+    -- req.logout() - Passport helper method availbale to logout.
+    NOTE: ms-auto, set the nav-links to the right side.
+5) Return to the same page after login:
+issue ?
+    -- suppose you try to load one page, and it loads but then it redirect to login.
+    -- After login, you need to start from the home screen to reach the same page,
+    -- To Make it more User friendly, we can take the OriginalUrl from the req i.e req.originalUrl and Redirect to that whne we attempt login.
+Problem: We cannot store the data in the session, since after login, previous session gets cleared up.[Imp]
+Solution: we use a middleware and res.locals, these are directly accessable to all templates and req,res cycles.
+Steps:
+    -- First in middleware where you check if the user is logged in or not ? If not then store the redirectUrl in req.session from req.originalUrl. 
+    -- Before the login passport authentication middleware, call a new middleware and transfer the redirectUrl from req.session to res.locals. 
+    -- In the login, before redirecting check if you have any redirectURL else just redirect to home page.
+
+NOTEs:
+    -- req.user, will contains information about the current User, It contains the deSerialized userDate from the session.
+    -- anything you pass as res.local.dummyKey is accessable to all the templates. basically you can use dummyKey directly in the render files.
+    In Express.js, 
+    -- res.locals is an object that provides a way to pass data through the application during the request-response cycle. 
+    -- It allows you to store variables that can be accessed by your templates and other middleware functions.

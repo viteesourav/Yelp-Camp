@@ -10,6 +10,10 @@ const methodOverride = require('method-override');
 const ejsMate = require('ejs-mate'); //this is ejs engine used for simplifying partials.
 const session = require('express-session'); // handles the session realted stuff.
 const flash = require('connect-flash'); //this handles flash messages.
+//Requiring Passport
+const User = require('./models/user.js');
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
 
 
 //requiring custom files from the working directory
@@ -37,15 +41,33 @@ app.use(session({
         maxAge: 1000*60*60*24*7, //this sets the max age of the session to 1 week. (takes in millisecond)
     }
 }))
+
+//We will configure our Passport here...
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));  //tells passport to implements localStrategy
+
+//handles the storing of USer data in and out of the session...
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+//Dummy Login Route.. [For testing passport]
+// app.get('/fakeLogin', async(req,res)=>{
+//     const newUser = new User({email: "sourav.mitra@campGround.com", username: "sourRock45"});  //new user without password.
+//     const registeredUser = await User.register(newUser, 'this23yearOld');  //new User is registered with passpord.
+//     res.send(registeredUser);
+// })
+
 //enabling flash..
 app.use(flash());
 //defining flash-middleware to make sure it renders the messages.
+//This middleware handles global variables sent to all the render forms..
 app.use((req,res,next)=>{
-    res.locals.success = req.flash('success');  //res.locals defines params that goes straight to the render form.
+    res.locals.userLoggedIn = req.user;
+    res.locals.success = req.flash('success');  //res.locals defines params that goes straight to the render form i.e success and error is accessable to all ejs templates. 
     res.locals.error = req.flash('error');
     next();
 })
-
 
 //we will server the static public directory
 app.use(express.static(path.join(__dirname, 'public')));
@@ -66,12 +88,15 @@ app.get('/', (req,res)=>{
 });
 
 //testing the campground model with express..
-app.get('/insertDummy', catchAsync(async (req, res)=>{
-    const newCamp = new Campground({title: 'Backyard', price: "0", description: "Cheap and Free Ground", location: 'My house'});
-    await newCamp.save();
-    res.send('Dummy Camp inserted in the DB');
-}))
+// app.get('/insertDummy', catchAsync(async (req, res)=>{
+//     const newCamp = new Campground({title: 'Backyard', price: "0", description: "Cheap and Free Ground", location: 'My house'});
+//     await newCamp.save();
+//     res.send('Dummy Camp inserted in the DB');
+// }))
 
+//calling the auth related Routers
+const userRouters = require('./router/user.js');
+app.use('/', userRouters);
 
 //importing and implementing required Routers...
 const CampgroundRouters = require('./router/campground');

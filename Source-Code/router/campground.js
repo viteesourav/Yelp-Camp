@@ -3,6 +3,8 @@ const catchAsync = require('../utils/catchAsync'); //this brings us the custom a
 const ExpressError = require('../utils/ExpressError');
 const {campgroundSchema} = require('../utils/joiSchemaValidator'); //this brings the joi schema validator
 const router = express.Router();
+//fetching the Passport authentication middleware
+const {isLoggedIn} = require('../utils/loginMiddleware');
 
 //requiring custom files from the working directory
 const Campground = require('../models/campground.js');
@@ -28,13 +30,18 @@ router.get('/', catchAsync( async(req,res)=>{
 }));
 
 //basic create route..
-router.get('/new', (req,res)=>{
+router.get('/new', isLoggedIn, (req,res)=>{
+    //This part is moved to its seperate middleware...
+    // if(!req.isAuthenticated()) {
+    //     req.flash('error', 'User must be Logged in !');
+    //     return res.redirect('/login');
+    // }
     console.log('Opening create new campground page');
     res.render('campgrounds/new.ejs');
 })
 
 //This handles validation if the body dont have a campground data...
-router.post('/',validateSchema, catchAsync( async(req,res,next)=>{
+router.post('/',isLoggedIn, validateSchema, catchAsync( async(req,res,next)=>{
     //console.log(req.body); //just to view the submitted data
     //if(!req.body.campground) throw new ExpressError('Invalid campground-form Data', 400); 
     const newCamp = new Campground(req.body.campground);
@@ -44,7 +51,7 @@ router.post('/',validateSchema, catchAsync( async(req,res,next)=>{
 }))
 
 //baisc show-route, detail of one campground.
-router.get('/:id', catchAsync( async(req,res)=>{
+router.get('/:id', isLoggedIn, catchAsync( async(req,res)=>{
     const campground = await Campground.findById(req.params.id).populate('reviews');
     //console.log(campground);
     if(!campground) {
@@ -56,7 +63,7 @@ router.get('/:id', catchAsync( async(req,res)=>{
 
 
 //edit route..
-router.get('/:id/edit', catchAsync( async(req,res)=>{
+router.get('/:id/edit', isLoggedIn, catchAsync( async(req,res)=>{
     const campground = await Campground.findById(req.params.id);
     if(!campground) {
         req.flash('error', 'Cannot find and update the campground !');
@@ -66,7 +73,7 @@ router.get('/:id/edit', catchAsync( async(req,res)=>{
 }))
 
 //validating the input using joi schema validator...
-router.put('/:id',validateSchema, catchAsync( async(req,res)=>{
+router.put('/:id', isLoggedIn, validateSchema, catchAsync( async(req,res)=>{
     const {id} = req.params;
     //console.log(req.params);
     const campground = await Campground.findByIdAndUpdate(id, {...req.body.campground}); //using spread operator..
@@ -76,7 +83,7 @@ router.put('/:id',validateSchema, catchAsync( async(req,res)=>{
 }))
 
 //campground delete route...
-router.delete('/:id', catchAsync( async(req,res)=>{
+router.delete('/:id', isLoggedIn, catchAsync( async(req,res)=>{
     //res.send("Yes this will be Deleted !!");
     const{id} = req.params;
     await Campground.findByIdAndDelete(id);
