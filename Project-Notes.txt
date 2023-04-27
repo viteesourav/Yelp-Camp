@@ -170,3 +170,6 @@ NOTE: [Imporatant]
         .post(...Runs when get is triggered for the above path...)
         .put(...Runs when get is triggered for the above path...)
   -- whenever we are Restructuring Routes, Always make sure the Order of the Routes matters. [Very Very Important] 
+
+**Improving the Rating functionality**
+    -- Tool used: Starability, a github repo with the required css availble for Star functionality.
