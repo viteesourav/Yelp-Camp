@@ -7,17 +7,15 @@ const { isLoggedIn, redirectURL } = require('../utils/Middleware');
 
 const userController = require('../controllers/user');
 
-//basic Route to navigate to REgister Form - GET
-router.get('/register', userController.renderRegister);
+router.route('/register')
+    .get(userController.renderRegister) //basic Route to navigate to REgister Form - GET
+    .post(userController.registerNewUser); //actual Route for adding a new user in the db...
 
-//actual Route for adding a new user in the db...
-router.post('/register', userController.registerNewUser);
-
-//Defining the login route...
-router.get('/login', userController.renderLogin);
-
-//handles the login POST Route using the passport authenticate middleware...
-router.post('/login', redirectURL, passport.authenticate('local',{failureFlash: true, failureRedirect: '/login'}), userController.doLogin)
+router.route('/login')
+    .get(userController.renderLogin) //Defining the login route...
+    .post(redirectURL,   
+        passport.authenticate('local',{failureFlash: true, failureRedirect: '/login'}), 
+        userController.doLogin); //handles the login POST Route using the passport authenticate middleware...
 
 //implementing Logout Route
 router.get('/logout', isLoggedIn, userController.doLogout);
