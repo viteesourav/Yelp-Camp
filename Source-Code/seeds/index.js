@@ -34,6 +34,7 @@ const dbSeed = async() =>{
         let newCamp = new Campground({
             title: newTitle, 
             location: newPlace,
+            author: '64457c2b30ab23cb4dadf190',  //This id is taken directly from DB, We have an user with this ID already present in User database in Yelp-camp.
             image: 'https://images.unsplash.com/photo-1518602164578-cd0074062767?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxjb2xsZWN0aW9uLXBhZ2V8MXw0ODMyNTF8fGVufDB8fHx8&auto=format&fit=crop&w=600&q=60',
             description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Unde consectetur minima reprehenderit illo repellat? Voluptatem iure ratione animi culpa corrupti et, libero eligendi accusantium voluptate deserunt! Eius, non. Tenetur, eaque?',
             price: Math.floor(Math.random() * 20) + 10

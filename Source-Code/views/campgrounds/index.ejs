@@ -15,7 +15,24 @@
                         <h5 class="card-title"><%= campground.title %> </h5>
                         <h5 class="card-subtitle mb-2 text-muted">$<%= campground.price %> </h5>
                         <p class="card-text"><%= campground.description %></p>
-                        <a href="/campgrounds/<%= campground.id %>" class="btn btn-primary">View <%= campground.title %></a>
+                        <div class="text-end">
+                          <footer class="blockquote-footer">Featured By <span class="fw-bold"><%= campground.author.username %></span></footer>
+                        </div>
+                        <!-- <a href="/campgrounds/<%= campground.id %>" class="btn btn-primary">View <%= campground.title %></a> -->
+                        <form action="/campgrounds/<%= campground.id %>" method="GET">
+                          <button type="submit" class="btn btn-primary position-relative">
+                            View <%= campground.title %>
+                            <% if(campground.reviews.length > 0) { %>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                              <% if(campground.reviews.length < 9) { %>  
+                                <%= campground.reviews.length %>
+                              <%  } else { %> +<%= campground.reviews.length %> 
+                                <% } %>
+                              <span class="visually-hidden">unread messages</span>
+                            </span>
+                            <% } %>
+                          </button>
+                        </form>
                       </div>
                 </div>
             </div>

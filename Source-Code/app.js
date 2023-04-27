@@ -64,6 +64,7 @@ app.use(flash());
 //This middleware handles global variables sent to all the render forms..
 app.use((req,res,next)=>{
     res.locals.userLoggedIn = req.user;
+    // console.log("LoggedIn User Details: ",res.locals.userLoggedIn);
     res.locals.success = req.flash('success');  //res.locals defines params that goes straight to the render form i.e success and error is accessable to all ejs templates. 
     res.locals.error = req.flash('error');
     next();

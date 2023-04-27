@@ -126,3 +126,12 @@ NOTEs:
     In Express.js, 
     -- res.locals is an object that provides a way to pass data through the application during the request-response cycle. 
     -- It allows you to store variables that can be accessed by your templates and other middleware functions.
+
+** Handling Authorization **
+    -- All CRUD Layer Operations must be specific to Users. Thus, Linked Campgroud Schema with users.
+    -- In the client, Authorization can be handled by comparing the loggedIn User form req.user and the Campground data we store in the database.
+    -- For Server Side authorization,
+       Need to define a middleware, that checkes if the logged in user is same as the campgraound user ? If yes allow him else Show proper error message.
+    -- Also make sure to cover Authorization for showing the page and the API Route. eg: editCampground page and editCampground route both should be protected.
+NOTE:
+-- Project is little re-structured, All the middleware funtions are put in one middleware file, under utility folder.

@@ -15,17 +15,20 @@
             </ul>
             <ul class="navbar-nav ms-auto">
               <% if(!userLoggedIn) { %>
-              <li class="nav-item">
-                <a class="nav-link" href="/register">Register</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/login">LogIn</a>
-              </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/register">Register</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/login">LogIn</a>
+                </li>
               <% } else { %>
+                <li class="nav-item">
+                  <a class="nav-link" href="#"> Holla! <span class="text-uppercase"><%= userLoggedIn.username %></span></a>
+                </li>
                 <li class="nav-item">
                   <a class="nav-link" href="/logout">Logout</a>
                 </li>
-                <% } %>
+              <% } %>
               </ul>
           </div>
         </div>

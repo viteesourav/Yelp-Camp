@@ -1,31 +1,18 @@
 const express = require('express');
 const catchAsync = require('../utils/catchAsync'); //this brings us the custom async error handler
-const ExpressError = require('../utils/ExpressError');
-const {campgroundSchema} = require('../utils/joiSchemaValidator'); //this brings the joi schema validator
+//Moved to Middleware file.....
+// const ExpressError = require('../utils/ExpressError');
+// const {campgroundSchema} = require('../utils/joiSchemaValidator'); //this brings the joi schema validator
 const router = express.Router();
 //fetching the Passport authentication middleware
-const {isLoggedIn} = require('../utils/loginMiddleware');
+const {isLoggedIn, validateSchema, isAuthorized} = require('../utils/Middleware');
 
 //requiring custom files from the working directory
 const Campground = require('../models/campground.js');
 
-//Joi validator handler middleware to mongoose schema vlaidation...
-const validateSchema = (req,res,next)=>{
-    //using js schema validator... 
-    const {error} = campgroundSchema.validate(req.body);  //validating the incoming data from the form.
-    //console.log(error);
-    if(error) {
-        //console.log(error.details);  --> this returns a list of objects contianing info about the schema error encountered.
-        const msg = error.details.map(err => err.message).join(','); //this is how you extract the message from JOI error object.
-        throw new ExpressError(msg, 400);  //also can be written like: return next(new ExpressError(msg, 400));
-    } else {
-        next();
-    }
-}
-
 //basic Routing, home-page for campground.
 router.get('/', catchAsync( async(req,res)=>{
-    const response = await Campground.find({});
+    const response = await Campground.find({}).populate('reviews').populate('author');
     res.render('campgrounds/index.ejs', {campgrounds: response});
 }));
 
@@ -45,6 +32,8 @@ router.post('/',isLoggedIn, validateSchema, catchAsync( async(req,res,next)=>{
     //console.log(req.body); //just to view the submitted data
     //if(!req.body.campground) throw new ExpressError('Invalid campground-form Data', 400); 
     const newCamp = new Campground(req.body.campground);
+    newCamp.author = req.user._id;
+    // res.send(newCamp);
     await newCamp.save();
     req.flash('success', 'Congratulations !! New CampGroup Created successfully !');
     res.redirect(`/campgrounds/${newCamp._id}`);
@@ -52,8 +41,8 @@ router.post('/',isLoggedIn, validateSchema, catchAsync( async(req,res,next)=>{
 
 //baisc show-route, detail of one campground.
 router.get('/:id', isLoggedIn, catchAsync( async(req,res)=>{
-    const campground = await Campground.findById(req.params.id).populate('reviews');
-    //console.log(campground);
+    const campground = await Campground.findById(req.params.id).populate('reviews').populate('author');
+    // console.log(campground);
     if(!campground) {
         req.flash('error', 'Cannot find the campground !');
         return res.redirect('/campgrounds');
@@ -63,7 +52,8 @@ router.get('/:id', isLoggedIn, catchAsync( async(req,res)=>{
 
 
 //edit route..
-router.get('/:id/edit', isLoggedIn, catchAsync( async(req,res)=>{
+router.get('/:id/edit', isLoggedIn, isAuthorized, catchAsync( async(req,res)=>{
+    // console.log('campground id: ', req.params);
     const campground = await Campground.findById(req.params.id);
     if(!campground) {
         req.flash('error', 'Cannot find and update the campground !');
@@ -73,7 +63,7 @@ router.get('/:id/edit', isLoggedIn, catchAsync( async(req,res)=>{
 }))
 
 //validating the input using joi schema validator...
-router.put('/:id', isLoggedIn, validateSchema, catchAsync( async(req,res)=>{
+router.put('/:id', isLoggedIn, isAuthorized, validateSchema, catchAsync( async(req,res)=>{
     const {id} = req.params;
     //console.log(req.params);
     const campground = await Campground.findByIdAndUpdate(id, {...req.body.campground}); //using spread operator..
@@ -83,7 +73,7 @@ router.put('/:id', isLoggedIn, validateSchema, catchAsync( async(req,res)=>{
 }))
 
 //campground delete route...
-router.delete('/:id', isLoggedIn, catchAsync( async(req,res)=>{
+router.delete('/:id', isLoggedIn, isAuthorized, catchAsync( async(req,res)=>{
     //res.send("Yes this will be Deleted !!");
     const{id} = req.params;
     await Campground.findByIdAndDelete(id);

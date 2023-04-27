@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require('../models/user');
 const catchAsync = require('../utils/catchAsync');
 const passport = require('passport');
-const { isLoggedIn, redirectURL } = require('../utils/loginMiddleware');
+const { isLoggedIn, redirectURL } = require('../utils/Middleware');
 
 //basic Route to navigate to REgister Form - GET
 router.get('/register', (req,res)=>{
@@ -45,7 +45,7 @@ router.post('/login', redirectURL, passport.authenticate('local',{failureFlash: 
     // res.redirect('/campgrounds');
     //Instead of directly redirecting to campgrounds we will check if any redirectURL present or not ?
     const redirectURL = res.locals.redirectURL || '/campgrounds';
-    console.log(req.session); //After successful login, the session refreshes, and all previous session data cleared.
+    // console.log(req.session); //After successful login, the session refreshes, and all previous session data cleared.
     res.redirect(redirectURL);
 
 })
