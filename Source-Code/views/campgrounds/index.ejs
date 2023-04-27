@@ -24,9 +24,9 @@
                             View <%= campground.title %>
                             <% if(campground.reviews.length > 0) { %>
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                              <% if(campground.reviews.length < 9) { %>  
+                              <% if(campground.reviews.length < 100) { %>  
                                 <%= campground.reviews.length %>
-                              <%  } else { %> +<%= campground.reviews.length %> 
+                              <%  } else { %> 100+ 
                                 <% } %>
                               <span class="visually-hidden">unread messages</span>
                             </span>

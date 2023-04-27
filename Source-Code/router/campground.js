@@ -41,8 +41,17 @@ router.post('/',isLoggedIn, validateSchema, catchAsync( async(req,res,next)=>{
 
 //baisc show-route, detail of one campground.
 router.get('/:id', isLoggedIn, catchAsync( async(req,res)=>{
-    const campground = await Campground.findById(req.params.id).populate('reviews').populate('author');
-    // console.log(campground);
+    //This is how you handle nested populate of fields...
+    //basically, here, you will first get all Reviews based on review Id
+    // then for each Review, you will populate the users based on userId
+    const campground = await Campground.findById(req.params.id)
+    .populate( { 
+        path: 'reviews',
+        populate: {
+            path: 'author'
+        }
+     }).populate('author');
+    console.log('Populated Campground Details: ',campground);
     if(!campground) {
         req.flash('error', 'Cannot find the campground !');
         return res.redirect('/campgrounds');

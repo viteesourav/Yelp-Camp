@@ -1,7 +1,8 @@
 //defining all the requires needed by this middleware-file
-const {campgroundSchema} = require('./joiSchemaValidator'); //this brings the joi schema validator
+const {campgroundSchema, reviewSchema} = require('./joiSchemaValidator'); //this brings the joi schema validator
 const ExpressError = require('./ExpressError');
 const Campground = require('../models/campground');
+const Review = require('../models/review');
 
 
 //This verify if the user is still logged-in or not ?
@@ -37,7 +38,20 @@ module.exports.validateSchema = (req,res,next)=>{
     }
 }
 
-//this middleware job is to Check if the current User is Authorized to do the activity or not ?
+//Joi validation middleware to do schema validation of review...
+module.exports.validateReviewSchema = (req,res,next) =>{
+    const {error} = reviewSchema.validate(req.body);
+
+    if(error) {
+        const msg = error.details.map(err => err.message).join(',');
+        throw new ExpressError(msg, 400);
+    } else {
+        next();
+    }
+}
+
+
+//this middleware job is to Check if the current User is Authorized to do the activity on campground or not ?
 module.exports.isAuthorized = async(req, res, next) =>{
     // console.log('campground id: ', req.params);
     const {id} = req.params;
@@ -49,6 +63,17 @@ module.exports.isAuthorized = async(req, res, next) =>{
     if(!campdetails.author.equals(req.user._id)) {
         req.flash('error', 'This User is not allowed to perform the Operation');
         return res.redirect('/campgrounds');
+    }
+    next();
+}
+
+//checks if the User is Authorised to perform activity on Review Route ?
+module.exports.isReviewAuthorized = async(req,res,next) => {
+    const {id, reviewId} = req.params;
+    const reviewDetails = await Review.findById(reviewId);
+    if(!reviewDetails.author.equals(req.user._id)) {
+        req.flash('error', 'User is not allowed to delete the Review !');
+        return res.redirect(`/campgrounds/${id}`);
     }
     next();
 }

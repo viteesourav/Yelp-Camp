@@ -70,6 +70,11 @@ NOTE(Just something that needed to be very clear):
         -- flash partials for success and error alerts Done.
 *******************************************************************************************************************************************************************************************************
 
+NOTE: If you trying to add a file location inside require, VSCode will give suggestion.
+   -- If you trying to destructure, It will not. i.e const { middleware } = require('..path'), here you will not get suggestions for path by vscode.
+   -- If you do like this, require('..path'), then assign it to const middleware or destructure it like const {middleware}, This is efficient Practise with nodeJS require path.
+
+
 **Adding Authentication And Authorization into the APP**
 
 Authentication using Passport: (Passport middleware for NOde JS)
@@ -120,8 +125,8 @@ Steps:
     -- Before the login passport authentication middleware, call a new middleware and transfer the redirectUrl from req.session to res.locals. 
     -- In the login, before redirecting check if you have any redirectURL else just redirect to home page.
 
-NOTEs:
-    -- req.user, will contains information about the current User, It contains the deSerialized userDate from the session.
+NOTEs: [Important]
+    -- Once the user is authenticated, req.user, will contains information about the current User, It contains the deSerialized userDate from the session.
     -- anything you pass as res.local.dummyKey is accessable to all the templates. basically you can use dummyKey directly in the render files.
     In Express.js, 
     -- res.locals is an object that provides a way to pass data through the application during the request-response cycle. 
@@ -135,3 +140,12 @@ NOTEs:
     -- Also make sure to cover Authorization for showing the page and the API Route. eg: editCampground page and editCampground route both should be protected.
 NOTE:
 -- Project is little re-structured, All the middleware funtions are put in one middleware file, under utility folder.
+-- we can do nested populate also. Like campground has users and reviews, we will populate both but again reviews have users too. We need to populate them...
+   For this we can chain populate and for populating the nested one, 
+   .populate({path: 'reviews', populate: { path: 'users'}}) --> this means you are first populating all the reviews and then for each reviews you are populating users.
+
+NOTE:
+-- Always while handling Authorization of any model, like Campground or Review, You Make sure you go from API to Show page.
+   Means, First handle the Authorization of the concerned API, then, the button visibility and then Page from where the API is triggered
+
+Thus, This concludes adding passport Authentication, adding a middleware that checks if the user is loggedin, Adding Authorization based on the loggedIn user.
