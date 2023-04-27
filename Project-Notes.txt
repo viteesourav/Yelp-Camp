@@ -149,3 +149,24 @@ NOTE:
    Means, First handle the Authorization of the concerned API, then, the button visibility and then Page from where the API is triggered
 
 Thus, This concludes adding passport Authentication, adding a middleware that checks if the user is loggedin, Adding Authorization based on the loggedIn user.
+
+NOTE: MVC -> Model View controllers. 
+ Model -> Contains the Schema and Structure of an entity.
+ View -> Stores all the static Files, layouts, Front-end Stuff realted to the Enity.
+ Controller -> This is the place where you bring together Models and Views and use them to Control the Flow.
+
+**REstructing Code Structure**
+-- We will clear the Route Files by moving the (res,req) callback functions to its Controller
+-- and we will also group Routes having same Route path but different Verb with Express Router.route
+
+Controllers:
+  -- We will have controllers for each model, that contains the functionality.
+  -- We have Route Specific Controllers that handles the Operations of each Routes inside the Controllers.
+
+NOTE: [Imporatant]
+  -- Express Router provides a route function to group all the verb for the same path.
+   eg: Router.route('..path')
+        .get(...Runs when get is triggered for the above path...)
+        .post(...Runs when get is triggered for the above path...)
+        .put(...Runs when get is triggered for the above path...)
+  -- whenever we are Restructuring Routes, Always make sure the Order of the Routes matters. [Very Very Important] 
