@@ -15,7 +15,7 @@
     <div class="row">
         <h1 class="text-center">Edit Campground</h1>
         <div class="col-md-6 offset-3 mb-5">
-            <form class="needs-validation" action="/campgrounds/<%= campground._id %>?_method=PUT" method="POST" novalidate>
+            <form class="needs-validation" action="/campgrounds/<%= campground._id %>?_method=PUT" method="POST" novalidate enctype="multipart/form-data">
                 <div class="mb-3">
                     <label class="form-label" for="title">Enter the Campgorund Name: </label>
                     <input class="form-control" type="text" id="title" name="campground[title]" value="<%= campground.title %>" required>
@@ -26,13 +26,6 @@
                 <div class="mb-3">
                     <label class="form-label" for="location">Enter the Campgorund Location: </label>
                     <input class="form-control" type="text" id="location" name="campground[location]" value="<%= campground.location %>" required>
-                    <div class="valid-feedback">
-                        looks Good!
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label" for="image-url">Enter the Campgorund Image url: </label>
-                    <input class="form-control" type="text" id="image-url" name="campground[image]" value="<%= campground.image %>" required>
                     <div class="valid-feedback">
                         looks Good!
                     </div>
@@ -53,6 +46,19 @@
                             looks Good!
                         </div>
                     </div>
+                </div>
+                <div class="mb-3 custom-file">
+                    <label for="campImg" class="form-label custom-file-label">Manage Campground images:</label>
+                    <input class="form-control" type="file" id="campImg" name="campImages" multiple>
+                </div>
+                <div class="mb-3">
+                    <% campground.images.forEach((img, index)=>{ %>
+                        <img src="<%= img.url %>" alt="campground image" class="img-thumbnail">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="deleteImgList[]" value="<%= img.filename %>" id="img-<%= index %>" <%= campground.images.length == 1 ? 'disabled':'' %>>
+                            <label class="form-check-label" for="img-<%= index %>"><span class="text-muted">Wanna Delete the Above Img ?</span></label>
+                          </div>
+                    <% }) %>
                 </div>
                 <div class="text-center">
                 <button class="btn btn-info">Edit</button>

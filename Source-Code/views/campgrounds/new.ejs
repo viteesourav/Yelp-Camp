@@ -2,7 +2,7 @@
 <div class="row">
     <h1 class="text-center">Add new Campground</h1>
     <div class="col-md-4 offset-4 mb-5">
-        <form class="needs-validation" action="/campgrounds" method="POST" novalidate>
+        <form class="needs-validation" action="/campgrounds" method="POST" novalidate enctype="multipart/form-data">
             <div class="mb-3">
                 <label class="form-label" for="title">Enter the Campgorund Name: </label>
                 <input class="form-control" type="text" id="title" name="campground[title]" required>
@@ -17,13 +17,16 @@
                     looks Good!
                 </div>
             </div>
-            <div class="mb-3">
+            <!-- <div class="mb-3">
+                <input type="file" name="campImages" id="Campimg" multiple>
+            </div> -->
+            <!-- <div class="mb-3">
                 <label class="form-label" for="image-url">Enter the Campgorund Image url: </label>
                 <input class="form-control" type="text" id="image-url" name="campground[image]" required>
                 <div class="valid-feedback">
                     looks Good!
                 </div>
-            </div>
+            </div> -->
             <div class="mb-3">
                 <label class="form-label" for="description">Enter the Campgorund description: </label>
                 <textarea class="form-control" type="text" id="description" name="campground[description]" required></textarea>
@@ -41,14 +44,20 @@
                     </div>
                 </div>
             </div>
-            <button class="btn btn-success">Add Campground</button>
+            <div class="mb-3 custom-file">
+                <label for="campImg" class="form-label custom-file-label">Upload Campground images:</label>
+                <input class="form-control" type="file" id="campImg" name="campImages" multiple>
+            </div>
+            <div class="my-4 text-center">
+                <button class="btn btn-success">Add Campground</button>
+            </div>
         </form>
     
     </div>
 </div>    
-<footer>
+<!-- <footer>
     <a href="/campgrounds">Show All campgrounds</a>
-</footer>
+</footer> -->
 
 <!-- Moving the below script for bootstrap client side validation to boiler plate for easy access -->
 <!-- <script>

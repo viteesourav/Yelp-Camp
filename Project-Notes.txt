@@ -172,4 +172,74 @@ NOTE: [Imporatant]
   -- whenever we are Restructuring Routes, Always make sure the Order of the Routes matters. [Very Very Important] 
 
 **Improving the Rating functionality**
-    -- Tool used: Starability, a github repo with the required css availble for Star functionality.
+    -- Tool used: Starability, (a github repo with the required css availble for Star functionality)
+
+** Adding impage Upload Feature For our Camp **
+Problems ?
+1) Basic Form cannot send document/File to Server. (NOt possible)
+2) Even if we manage to send File to server, It cannot be stored in Mongo. 
+   Why ? 
+   -- BSON has can handle documetn size maximum upto 16 MB.
+   Solution ? 
+   [cloudinary]
+   -- we can use a free image Hosting and API website for storing Images.
+   -- It will store the image and give us a public url to fetch it whenever we need.
+
+  ** How to Enable Forms to Accept Document and send it to Server ? 
+  -- By default, forms are submitted using encoding ->enctype: application/x-www-form-urlencoded [this is default]
+  -- For files support we need to specify, enctype: multipart/formData.
+  
+  In Server side, To parse multipart-data, we need another middleware. [Multer]
+    -- It is a npm Package, used to handle multipart-data, Mainily used to handle Files.
+    -- It baiscally, add 2 things to req,
+       1) body -> Contains the text containt from the Form.
+       2) file/files -> Contains the files containts from the Form.
+    -- It can store data localy also. [not preferred]
+    -- require the multer middleware, and execute it. eg: const upload = multer({dest: '/uploads'})
+    NOTE: Here dest is option, Here we are stroing the uploaded files locally in a folder called uploads.[will move it to cloudinary]
+  1) For Handling single File:
+    -- upload.single('nameOfTheFieldTakesFile'), add this as middleware, which parse the mutipart form data.
+  2) For Handling Multiple File upload:
+    -- add an attribute in the file type input, multiple[this is the key name]
+    -- upload.array('nameOfTheFieldTakesFile') --> will put all the files data in req.files [Note: 'files' for multiple and 'file' for single.]
+  3) For handling Form with no files:
+    -- for parsing a form data with just texts and enctype as mutipart.
+    -- add upload.none() middleware in the Route handler.
+
+  ** handling Private API key and Secret information.
+    -- You make a new file, .env -> Stores all key-value pair of information. eg: SECRET=12345
+    -- NPM package to access this file --> dotEnv
+    -- require('dotenv').config(), will bring your env variables to process.env
+    -- You can use the env Variable using the key, to get the value needed, eg: process.env.API_KEY -> this will getch API_KEY value from the .env file
+    NOTE: In development Mode, you use .env to bring Private info for APP, In production, It will be set in the env, no need for .env [Important]
+    NOTE: This .env file is not pushed to repo, so added in .gitignore [**It's for personal use only**]
+
+  ** Integration With cloudinary and multer
+    -- need to install [cloudinary Package] and [multer-storage-cloudinary]
+    -- cloudinary config the account.
+    -- multer-storage-cloudinary will upload the files and store the image url in the req file. [simplify the upload process]
+    -- It provides a way to connect to cloudinary account, uplaod the image and generate a url, fetch the image based on url under req.files.path
+    Advantage ? 
+      -- huge image sizes can be uploaded and stored in cloudinary, the cloudinary url can be stored in mongo.
+      -- we can use it to manage image properties, its height, width and crop levels. 
+  
+  ** Project Updates For Image uploads:
+    -- We will Add Multi-Campground Image Support for each Campground.
+    -- Updating the Schema, JOI Validations, Forms Changes for newCamp, showCamp.
+    NOTE: [IMP]
+        -- Since we changed the form enctype, Data submitted from form is not accessable until we parse it using multer.
+        -- All validations, controller functions need to form data, For this, multer should comes first, that parse the data and then passed to the controller functions.
+    -- We will use Bootstrap's Carousel to show the image's Uploaded for each Add New Action.
+    NOTE: The scroll functionality is handled for camp with one image and multiple images, Those left-Right toggels wont show in case of single img camp
+    -- We have handled the image upload both from add new camp and edit camp [here in edit, we can add more images to existing one].
+    Next we are modifying the image upload button.
+    -- Even with bootstrap, need a package [bs-custom-file-input] to manage the functionality. NOTE: we can just copy the CDN and add to boiler plate, Add the init() in validation js file [in public]
+    NOTE: Upate the div and label for File input by adding class: custom-file and  custom-file-label, [Without this the feature wont work !]
+    -- WE nee to handle when we need to delete any images ?
+    -- we can use checkboxs to allow users to select what images they want to delete and send it to the server side.
+    NOTE: for checkbox input if we declare name as deleteImgs[], then whatever is selected, that value will be inserted into the deleteImgs Array.[That is how we handle checkbox]
+    -- Handling Image deletion:
+    We need to handle deletion of images from 2 places...
+    1) we need to delete the images from cloudinary
+    2) we need to remove the filename form the images array in mongo.
+    Feature Added: If only one Pic is there for the Camp, Checkbox will be disabled.

@@ -1,3 +1,7 @@
+//adding the dotenv to fetch env details...[It will be specific to your cloudinary configurations]
+if(process.env.NODE_ENV != "production") {  //Currently running in development mode, After deployement it will production mode.
+   require('dotenv').config()  //brings env values here...
+}
 const express = require('express');
 const app = express();
 const path = require('path');

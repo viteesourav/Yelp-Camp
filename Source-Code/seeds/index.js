@@ -27,7 +27,7 @@ const dbSeed = async() =>{
     // const camp = new Campground({title: "testCamp", description: "myPlace"});
     // await camp.save();
     //Lets create bunch of random Data in the db...
-    for(let i=0;i<50;i++) {
+    for(let i=0;i<10;i++) {
         let rand = Math.floor(Math.random()*1000);
         let newPlace = `${location[rand].city}, ${location[rand].state}`;
         let newTitle =  `${returnRand(descriptors)} ${returnRand(places)}`;
@@ -35,9 +35,14 @@ const dbSeed = async() =>{
             title: newTitle, 
             location: newPlace,
             author: '64457c2b30ab23cb4dadf190',  //This id is taken directly from DB, We have an user with this ID already present in User database in Yelp-camp.
-            image: 'https://images.unsplash.com/photo-1518602164578-cd0074062767?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxjb2xsZWN0aW9uLXBhZ2V8MXw0ODMyNTF8fGVufDB8fHx8&auto=format&fit=crop&w=600&q=60',
             description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Unde consectetur minima reprehenderit illo repellat? Voluptatem iure ratione animi culpa corrupti et, libero eligendi accusantium voluptate deserunt! Eius, non. Tenetur, eaque?',
-            price: Math.floor(Math.random() * 20) + 10
+            price: Math.floor(Math.random() * 20) + 10,
+            images: [
+                {
+                    url: 'https://res.cloudinary.com/dt5g032wn/image/upload/v1683060277/CampGrounds/liam-simpson-umycmizZHn8-unsplash_m1vnjl.jpg',
+                    filename: 'CampGrounds/liam-simpson-umycmizZHn8-unsplash_m1vnjl',
+                }
+            ]
         });
         await newCamp.save();
     }
