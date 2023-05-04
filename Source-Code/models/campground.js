@@ -2,14 +2,19 @@ const mongoose = require('mongoose');
 const Review = require('./review');
 const schema = mongoose.Schema;
 
+//defining one virtual keyword that handles and manipulate the images from cloudinary...
+const ImageSchema = new schema({     
+    url: String,
+    filename: String
+});
+//Virtual property can only be implemented inside a Schema...
+ImageSchema.virtual('thumbnail_img').get(function() {
+    return this.url.replace('/upload', '/upload/w_200');
+})
+
 const campgroundSchema = new schema({
     title: String,
-    images: [
-        {
-            url: String,
-            filename: String
-        }
-    ],
+    images: [ImageSchema],
     price: Number,
     description: String,
     location: String,

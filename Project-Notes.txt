@@ -243,3 +243,9 @@ Problems ?
     1) we need to delete the images from cloudinary
     2) we need to remove the filename form the images array in mongo.
     Feature Added: If only one Pic is there for the Camp, Checkbox will be disabled.
+
+    ** Cloudinary Image Transformation ** [Ref: https://cloudinary.com/documentation/transformation_reference]
+    -- Cloudinary, Provides one cool feature like:
+       WE can add a bunch of properties in the image url eg: .../upload/w_150,h_150/....
+       This will transform the images as per the property defined in the url. [Wooow !! Cool fetaure !!]
+    -- We will define a virtual property in schema, and update the url with the thubnail url we need.

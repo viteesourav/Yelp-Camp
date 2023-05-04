@@ -58,6 +58,7 @@ module.exports.editCampground = async(req,res)=>{
         req.flash('error', 'Cannot find and update the campground !');
         return res.redirect('/campgrounds');
     }
+    console.log('Campground data: ', campground);
     res.render('campgrounds/edit.ejs', {campground});
 };
 
