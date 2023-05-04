@@ -4,20 +4,15 @@
 
 <div class="row">
     <div class="col-md-5 offset-1">
-
         <div class="card mb-4">
-            <!-- <% for(let img of campground.images) { %>
-              <img src="<%= img.url %>" class="card-img-top" alt="Image of some campground">
-            <% } %> -->
             <!-- Using Carosole fetaure from bootstrap 5 -->
             <div id="CampgroundPictureSlide" class="carousel carousel-dark slide" data-bs-ride="carousel">
-              <% if(campground.images.length > 1) { %>
+              <% if(campground.images.length > 0) { %>
               <div class="carousel-indicators">
                 <% campground.images.forEach((img, index) => { %>
                 <button type="button" data-bs-target="#CampgroundPictureSlide" data-bs-slide-to="<%= index %>" class=<%= index==0 ? 'active':'' %> aria-current="true" aria-label="Slide <%= index %>"></button>
                 <% }) %>
               </div>
-              <% } %>
               <div class="carousel-inner">
                 <% campground.images.forEach((img, index) => { %>
                   <div class="carousel-item <%= index===0 ? 'active':'' %>">
@@ -25,6 +20,13 @@
                   </div>
                 <% }) %>
               </div>
+              <% } else { %>
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                      <img src="https://res.cloudinary.com/dt5g032wn/image/upload/v1683235604/CampGrounds/img_lost_s1qwfb.jpg" class="d-block w-100" alt="No images available">
+                    </div>
+                </div>
+              <% } %>
               <% if(campground.images.length > 1) {  %>
               <button class="carousel-control-prev" type="button" data-bs-target="#CampgroundPictureSlide" data-bs-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -60,7 +62,7 @@
               2 days ago
             </div>
         </div>
-
+        
         <h3>Leave a Review</h3>
         <form class="mb-4 needs-validation" action="/campgrounds/<%= campground._id %>/reviews" method="post" novalidate>
           <div class="mb-2">
@@ -90,7 +92,13 @@
           <button class="btn btn-success btn-sm">Submit Review</button>
         </form> 
     </div>
-    <div class="col-md-5 offset-1">   
+    <div class="col-md-5 offset-1">
+      <div class="row mb-3 mx-auto">
+        <div class="col-md-4">
+        <!-- This handles the Map in the UI -->
+        <div id='map' style='width: 500px; height: 250px;'></div>
+      </div>
+      </div>
       <h3 class="text-center">View All Reviews</h3>
       <% if(campground.reviews.length == 0) { %>
         <h5 class="text-center text-muted p-5"> NO Reviews :( </h5>  
@@ -118,3 +126,10 @@
       <% } %> 
     </div>
 </div>
+
+<!-- Handling and passing the mapbox token[from env] and location[in campground] to our map display script file -->
+<script>
+  const mapbox_token = '<%- process.env.MAPBOX_TOKEN %>';
+  const geoLocation = '<%- JSON.stringify(campground) %>';
+</script>
+<script src="/JavaScripts/mapboxMap.js"></script>

@@ -5,6 +5,7 @@ mongoose.set('strictQuery', true); //suppress the warning...
 
 //requiring custom files from the working directory
 const Campground = require('../models/campground.js');
+const Review = require('../models/review.js');
 const location = require('./cities.js');
 const {descriptors, places} = require('./seedHelpers.js');
 
@@ -23,6 +24,7 @@ const returnRand = arr => arr[Math.floor(Math.random()* arr.length)];
 //here we will write a async function, and call it to clear the db and then insert fresh records for testing..
 const dbSeed = async() =>{
     await Campground.deleteMany({}); //Delete all the existing data from the DB.
+    await Review.deleteMany({}); //Delete all the data from Reviews.
     //insert a dummy data..
     // const camp = new Campground({title: "testCamp", description: "myPlace"});
     // await camp.save();
@@ -37,6 +39,11 @@ const dbSeed = async() =>{
             author: '64457c2b30ab23cb4dadf190',  //This id is taken directly from DB, We have an user with this ID already present in User database in Yelp-camp.
             description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Unde consectetur minima reprehenderit illo repellat? Voluptatem iure ratione animi culpa corrupti et, libero eligendi accusantium voluptate deserunt! Eius, non. Tenetur, eaque?',
             price: Math.floor(Math.random() * 20) + 10,
+            //giving a default geoTag to seeds --> [India]
+            geometry: {
+                type: 'Point',
+                coordinates: [ 78.476681027237, 22.1991660760527 ] 
+            },
             images: [
                 {
                     url: 'https://res.cloudinary.com/dt5g032wn/image/upload/v1683060277/CampGrounds/liam-simpson-umycmizZHn8-unsplash_m1vnjl.jpg',

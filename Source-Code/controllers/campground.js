@@ -1,6 +1,10 @@
 //This is a controller File, handles all the Callbacks for Campgrounds...
 const Campground = require('../models/campground');  //Brings the campground Model file here...
 const {cloudinary} = require('../cloudinary');
+//handling geoCoding with mapBox
+const mbxGeoCoding = require('@mapbox/mapbox-sdk/services/geocoding');
+const mapBoxToken = process.env.MAPBOX_TOKEN;
+const geoCoder = mbxGeoCoding({accessToken: mapBoxToken});
 
 module.exports.fetchAllCampgrounds = async(req,res)=>{
     const response = await Campground.find({}).populate('reviews').populate('author');
@@ -20,13 +24,19 @@ module.exports.renderNewCampForm = (req,res)=>{
 
 module.exports.AddNewCamp = async(req,res)=>{
     //console.log(req.body); //just to view the submitted data
+    //handling GeoCoding data based on Loaction....
+    const geolocation = await geoCoder.forwardGeocode({
+        query: req.body.campground.location,
+        limit: 1
+    }).send();
     //if(!req.body.campground) throw new ExpressError('Invalid campground-form Data', 400); 
     const newCamp = new Campground(req.body.campground);
     //handling Image uploads... [using multer and cloudinary]
     newCamp.images = req.files.map(img => ({url: img.path, filename: img.filename}));
     newCamp.author = req.user._id;
+    newCamp.geometry = geolocation.body.features[0].geometry;  //This is from mapBox geoCode API returns a geoJSON data.
     // res.send(newCamp);
-    // console.log('New Camp Added Details: ',newCamp);
+    console.log('New Camp Added Details: ',newCamp);
     await newCamp.save();
     req.flash('success', 'Congratulations !! New CampGroup Created successfully !');
     res.redirect(`/campgrounds/${newCamp._id}`);

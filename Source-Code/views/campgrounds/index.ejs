@@ -8,7 +8,7 @@
           <div class="card mb-2">
             <div class="row">
                 <div class="col-md-4">
-                    <img src="<%= campground.images[0].url %>" alt="Camping ground image" class="img-fluid">
+                    <img src="<%= (campground.images.length > 0) ? campground.images[0].url: 'https://res.cloudinary.com/dt5g032wn/image/upload/v1683235604/CampGrounds/img_lost_s1qwfb.jpg' %>" alt="Camping ground image" class="img-fluid">
                 </div>
                 <div class="col-md-8">
                     <div class="card-body">

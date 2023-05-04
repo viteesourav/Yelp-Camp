@@ -249,3 +249,33 @@ Problems ?
        WE can add a bunch of properties in the image url eg: .../upload/w_150,h_150/....
        This will transform the images as per the property defined in the url. [Wooow !! Cool fetaure !!]
     -- We will define a virtual property in schema, and update the url with the thubnail url we need.
+
+*** Yelp-Camp and Maps ***
+  -- Tool we will be using is: MapBox
+  -- Take the public Token and save it to the env file.
+  -- we also need npm client from mapbox: @mapbox/mapbox-sdk
+  -- Link to see all the services mapbox npm package provides: https://github.com/mapbox/mapbox-sdk-js/blob/HEAD/docs/services.md
+  
+  HOw we are going to Integrate Map to Yelp-Camp ?
+  -- We will take the location, the user Enters and Geo tag it -> fetch latitude and logitude[geoCode data] -> that we save in our DB.
+  -- Then based on this data, we can show a pin on the map.
+
+  ** GeoCoding ** [Ref:https://docs.mapbox.com/help/getting-started/geocoding/]
+    -- Based on the location, we need to get the lat and long of that place.
+    -- we will use mapbox npm API(forwardgeocoding) to fetch lat and long based on text provided for location.
+    -- we will store the geoCode data returned from the API in our Database, Later use it to show it in the map.
+    NOTE: Response path for fetching the long and lat -> response.body.feature.geometry.coordinate
+    -- By default this will return 5 matching response of the possible places. We can limit it to 1 place.
+    NOTE:
+    response.body.feature.geometry --> returns something called as geoJSON. [It has 2 keys, type and coordinate].
+
+  ** geoJSON **
+  -- special type of JSON that handles location based data.
+  -- It has 2 mandatory Key -> type and coordinate.
+  Why we use it ?
+  -- mongo has special functionality built specific for handling geoJSON type of data.
+
+  ** Displaying Map Based on geoJSON data *** [Ref: https://docs.mapbox.com/mapbox-gl-js/guides/]
+  -- We will use mapbox gl JS library to Display interactive maps and customize it.
+  -- customise with help of references and examples.
+  -- Popup Fucntionality added when you click on the Pin Icon on the Map.
