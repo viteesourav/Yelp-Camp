@@ -1,4 +1,8 @@
-<% layout('layouts/boilerplate.ejs') %> 
+<% layout('layouts/boilerplate.ejs') %>
+    <div class="mb-3">
+      <!-- This brings us the cluster map in the home page -->
+      <div id="map" style="width: 100%; height: 400px;"></div>
+    </div>
     <div class="text-center mb-3">
       <h1>Available Campgrounds <span>(<%= campgrounds.length %>)</span></h1>
     </div>
@@ -39,3 +43,11 @@
           </div>
     <% } %> 
   </div>
+
+  <!-- Providing the JS support for displaying the map -->
+  <script>
+    const mapbox_token = '<%- process.env.MAPBOX_TOKEN %>';
+    //here we are putting all Camp data into features array, because cluster maps expect in that form...
+    const allCampData = {features: JSON.parse('<%- JSON.stringify(campgrounds) %>') };  //This error we need to ignore...
+  </script>
+  <script src="/JavaScripts/clusterMap.js"></script>

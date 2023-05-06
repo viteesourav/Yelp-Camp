@@ -4,9 +4,9 @@ const campData = JSON.parse(geoLocation);
 const pinAt = campData.geometry.coordinates;
 const map = new mapboxgl.Map({
   container: 'map', // container ID
-  style: 'mapbox://styles/mapbox/streets-v12', // style URL
+  style: 'mapbox://styles/mapbox/streets-v12', // style URL: We are showing outdoor maps.
   center: pinAt, // starting position [lng, lat]
-  zoom: 7, // starting zoom
+  zoom: 12, // starting zoom
 });
 
 // Create a default Marker and add it to the map.

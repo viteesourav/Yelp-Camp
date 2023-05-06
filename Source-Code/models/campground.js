@@ -12,6 +12,17 @@ ImageSchema.virtual('thumbnail_img').get(function() {
     return this.url.replace('/upload', '/upload/w_200');
 })
 
+//Handling the visiblity of Virtuals keys [Default false, we are making it true..]
+const schemaOptions = {
+    toJSON: {
+        virtuals: true
+    },
+    toObject: {
+        virtuals:true
+    }
+
+}
+
 const campgroundSchema = new schema({
     title: String,
     images: [ImageSchema],
@@ -39,7 +50,16 @@ const campgroundSchema = new schema({
             ref: 'Review'
         }
     ]
-});
+},schemaOptions);
+
+//Virtual Property to handle the 'properties' key needed for cluster map by map-box
+campgroundSchema.virtual('properties').get(function() {
+    return {
+        id: `${this._id}`,
+        title: `${this.title}`,
+        imgUrl: `${this.images[0].url}`
+    }
+})
 
 campgroundSchema.post('findOneAndDelete', async(deletedDoc)=>{
    console.log("Triggering Campground post hook !!");

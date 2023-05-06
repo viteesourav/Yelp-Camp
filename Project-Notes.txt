@@ -279,3 +279,22 @@ Problems ?
   -- We will use mapbox gl JS library to Display interactive maps and customize it.
   -- customise with help of references and examples.
   -- Popup Fucntionality added when you click on the Pin Icon on the Map.
+
+  ** Adding Cluster Map Feature *** [Ref: https://docs.mapbox.com/mapbox-gl-js/example/cluster/]
+  -- Baiscally we will take the example code from mapbox gl js cluster map, and will manipulate to put our data in there.
+  NOTE:
+     While using the cluster map, when we send camp data from template to JS...
+     -- BAsically we have to use ejs <%- ... %> to extract the data, then formate it based on how the cluster map is expecting.
+  -- understadning how cluster map code works, can help us customise it more.
+  NOTE: [IMP]
+  -- Cluster Map of mapBox expect to receive the data in a particular fomate. [Ref: https://docs.mapbox.com/help/getting-started/creating-data/]
+      1) The Whole data should be inside feature Array, -> eg: feature: [{...}, {....}];
+      2) Each Object should have geometry data. Geometry data means geoJSON Data. eg: {geometry : {type: "Point", coordiante:["lng", "lat"]} }
+      3) EAch Object must have properties, It contains info for the Object. 
+      NOTE: Smart way to handle this, We can have a virtual property, that prepare this key with the details we need.
+  Project Updates:
+  -- Added few more steps for the clustor Map, BAsically gave the limits for switching between the cluster circles,
+  -- Specified the radius and color of the Cluster circles.
+  -- Specifed the radius and color for the unClustor-Circles.
+
+

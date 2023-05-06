@@ -29,7 +29,7 @@ const dbSeed = async() =>{
     // const camp = new Campground({title: "testCamp", description: "myPlace"});
     // await camp.save();
     //Lets create bunch of random Data in the db...
-    for(let i=0;i<10;i++) {
+    for(let i=0;i<100;i++) {
         let rand = Math.floor(Math.random()*1000);
         let newPlace = `${location[rand].city}, ${location[rand].state}`;
         let newTitle =  `${returnRand(descriptors)} ${returnRand(places)}`;
@@ -42,7 +42,7 @@ const dbSeed = async() =>{
             //giving a default geoTag to seeds --> [India]
             geometry: {
                 type: 'Point',
-                coordinates: [ 78.476681027237, 22.1991660760527 ] 
+                coordinates: [`${location[rand].longitude}`, `${location[rand].latitude}`] 
             },
             images: [
                 {
