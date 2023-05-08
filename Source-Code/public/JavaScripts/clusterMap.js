@@ -139,7 +139,7 @@ map.on('load', () => {
             .setHTML(
                 `<div class="container text-center">
                 <img src="${campPopupMsg.imgUrl}" alt="popup_image" height="100px" style="aspect-ratio: 1/1; border: 1px solid black; border-radius: 8px;">
-                <p><a href="/campgrounds/${campPopupMsg.id}"><span class="text-info">${campPopupMsg.title}</span></a></p>
+                <p><a href="/campgrounds/${campPopupMsg.id}"><span class="text-info text-capitalise">${campPopupMsg.title}</span></a></p>
               </div>`
             )
             .addTo(map);

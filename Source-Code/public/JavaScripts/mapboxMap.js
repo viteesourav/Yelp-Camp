@@ -1,7 +1,7 @@
 mapboxgl.accessToken = mapbox_token;
 // console.log(JSON.parse(geoLocation));   //we are able to receive the campdata here..
-const campData = JSON.parse(geoLocation);
-const pinAt = campData.geometry.coordinates;
+// const campData = JSON.parse(geoLocation);  //Instead of parsing here, we are parsing from show page and sending here..
+const pinAt = campGeoTag.geometry.coordinates;
 const map = new mapboxgl.Map({
   container: 'map', // container ID
   style: 'mapbox://styles/mapbox/streets-v12', // style URL: We are showing outdoor maps.
@@ -15,7 +15,7 @@ const marker1 = new mapboxgl.Marker()
 .setPopup(
     new mapboxgl.Popup({offset: 20})
     .setHTML(
-        `<b>${campData.title}</b><p>${campData.location}</p>`
+        `<b>${campGeoTag.title}</b><p>${campGeoTag.location}</p>`
     )
 )
 .addTo(map);

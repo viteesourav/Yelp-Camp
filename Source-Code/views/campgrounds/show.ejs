@@ -130,6 +130,6 @@
 <!-- Handling and passing the mapbox token[from env] and location[in campground] to our map display script file -->
 <script>
   const mapbox_token = '<%- process.env.MAPBOX_TOKEN %>';
-  const geoLocation = '<%- JSON.stringify(campground) %>';
+  const campGeoTag = JSON.parse('<%- JSON.stringify(campground) %>');
 </script>
 <script src="/JavaScripts/mapboxMap.js"></script>
