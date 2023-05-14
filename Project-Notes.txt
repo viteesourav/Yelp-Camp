@@ -297,4 +297,12 @@ Problems ?
   -- Specified the radius and color of the Cluster circles.
   -- Specifed the radius and color for the unClustor-Circles.
 
+  ** Updating Styling Using Bootstrap and custom CSS **
+  
+  IMP --> Here we use few bootstrap class that we frequently use to build basic web pages. [Pay more Attention to the bootstrap classes and the CSS files]
 
+  Project updates:
+  -- Adding a home page, For CampGround, Using bootstrap and Custom Css to Style it.
+  -- Making the Login Screen, Registration Screen, All Campground page looks more presentable, with card layout and bootstrap.
+  -- Adding Responsive-ness to Edit and add new camp pages.
+  -- Adjusted the pitch of the cluster map, also removed the inline styles from the maps.

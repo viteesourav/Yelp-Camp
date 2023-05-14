@@ -12,11 +12,12 @@ mapboxgl.accessToken = mapbox_token;
 //Added a virtual Propety in the schema to handle the 'properties' key for campground.[Better Approach]
 
 const map = new mapboxgl.Map({
-    container: 'map',
+    container: 'clusterMap',
     // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
     style: 'mapbox://styles/mapbox/light-v11',
     center: [-103.5917, 40.6699],
-    zoom: 3
+    zoom: 3,
+    pitch: 50
 });
 
 map.on('load', () => {
@@ -154,7 +155,9 @@ map.on('load', () => {
 });
 
 // Add zoom and rotation controls to the map.
-map.addControl(new mapboxgl.NavigationControl());
+map.addControl(new mapboxgl.NavigationControl({
+    visualizePitch: true
+}));
 
 //add full SCreen accessability
 map.addControl(new mapboxgl.FullscreenControl());

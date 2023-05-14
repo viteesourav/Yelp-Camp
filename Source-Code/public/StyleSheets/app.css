@@ -1,0 +1,11 @@
+/* We can put all the app-level css here */
+#clusterMap {
+    width: 100%;
+    height: 400px;
+}
+
+#map {
+    width: 500px;
+    height: 250px;
+}
+
