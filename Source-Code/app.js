@@ -18,6 +18,10 @@ const flash = require('connect-flash'); //this handles flash messages.
 const User = require('./models/user.js');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
+//Requiring for Protection againt mongo Injection.
+const mongoSanitize = require('express-mongo-sanitize');
+//HTTP response header Middleware for security
+const helmet = require("helmet");
 
 
 //requiring custom files from the working directory
@@ -34,14 +38,68 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(methodOverride('_method'));
+app.use(mongoSanitize());  //This will sanitize req body, query and params
+//Add the security for HTTP Response Headers...
+app.use(helmet());
+
+//Configuring Helmet's Content Security Prolicy (CSP)...
+//This are the allowed exteranl CDNs URL that we want to use in our native application...
+const scriptSrcUrls = [
+    "https://stackpath.bootstrapcdn.com/",
+    "https://api.tiles.mapbox.com/",
+    "https://api.mapbox.com/",
+    "https://kit.fontawesome.com/",
+    "https://cdnjs.cloudflare.com/",
+    "https://cdn.jsdelivr.net",
+];
+const styleSrcUrls = [
+    "https://kit-free.fontawesome.com/",
+    "https://stackpath.bootstrapcdn.com/",
+    "https://api.mapbox.com/",
+    "https://api.tiles.mapbox.com/",
+    "https://fonts.googleapis.com/",
+    "https://use.fontawesome.com/",
+    "https://cdn.jsdelivr.net",
+];
+const connectSrcUrls = [
+    "https://api.mapbox.com/",
+    "https://a.tiles.mapbox.com/",
+    "https://b.tiles.mapbox.com/",
+    "https://events.mapbox.com/",
+];
+const fontSrcUrls = [];
+
+//Configuring Helmet's CSP based on the above allowed URls List...
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: [],
+            connectSrc: ["'self'", ...connectSrcUrls],
+            scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
+            styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+            workerSrc: ["'self'", "blob:"],
+            objectSrc: [],
+            imgSrc: [
+                "'self'",
+                "blob:",
+                "data:",
+                "https://res.cloudinary.com/dt5g032wn/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT! 
+                "https://images.unsplash.com/",
+            ],
+            fontSrc: ["'self'", ...fontSrcUrls],
+        },
+    })
+);
 
 //enabling session
 app.use(session({
+    name: 'ExpSession',
     secret: 'ThisMySecretKeyForSessionSign',  //Required Parameter for session
     resave:false,
     saveUninitialized:true,
     cookie: {
         httpOnly: true,
+        // secure: true,  //only use in production env
         maxAge: 1000*60*60*24*7, //this sets the max age of the session to 1 week. (takes in millisecond)
     }
 }))
@@ -125,6 +183,9 @@ app.use((err, req, res, next)=>{
     //res.send('Damn ! It broke :( ');
     if(!err.message) err.message = 'Damn ! It broke :(';  //this will update the message in err if its not there...
     const {statusCode = 500} = err;
+    console.log('****** ERROR STACK START ***********');
+    console.log(err); //Logs the error to the server console
+    console.log('****** ERROR STACK END *************');
     res.status(statusCode).render('error.ejs', {err});
 })
 

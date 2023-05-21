@@ -16,14 +16,14 @@
               <div class="carousel-inner">
                 <% campground.images.forEach((img, index) => { %>
                   <div class="carousel-item <%= index===0 ? 'active':'' %>">
-                    <img src="<%= img.url  %>" class="d-block w-100" alt="Camp images">
+                    <img src="<%= img.url  %>" class="d-block w-100" alt="Camp images" crossorigin="anonymous">
                   </div>
                 <% }) %>
               </div>
               <% } else { %>
                 <div class="carousel-inner">
                     <div class="carousel-item active">
-                      <img src="https://res.cloudinary.com/dt5g032wn/image/upload/v1683235604/CampGrounds/img_lost_s1qwfb.jpg" class="d-block w-100" alt="No images available">
+                      <img src="https://res.cloudinary.com/dt5g032wn/image/upload/v1683235604/CampGrounds/img_lost_s1qwfb.jpg" class="d-block w-100" alt="No images available" crossorigin="anonymous">
                     </div>
                 </div>
               <% } %>

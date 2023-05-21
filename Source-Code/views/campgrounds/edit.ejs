@@ -53,7 +53,7 @@
                 </div>
                 <div class="mb-3">
                     <% campground.images.forEach((img, index)=>{ %>
-                        <img src="<%= img.thumbnail_img %>" alt="campground image">
+                        <img src="<%= img.thumbnail_img %>" alt="campground image" crossorigin="anonymous">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" name="deleteImgList[]" value="<%= img.filename %>" id="img-<%= index %>" <%= campground.images.length == 1 ? 'disabled':'' %>>
                             <label class="form-check-label" for="img-<%= index %>"><span class="text-muted">Wanna Delete the Above Img ?</span></label>

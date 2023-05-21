@@ -306,3 +306,68 @@ Problems ?
   -- Making the Login Screen, Registration Screen, All Campground page looks more presentable, with card layout and bootstrap.
   -- Adding Responsive-ness to Edit and add new camp pages.
   -- Adjusted the pitch of the cluster map, also removed the inline styles from the maps.
+
+** Handling Security Issue with APP **
+  
+1) SQL Injections:
+    -- One type of vunerabilty That applications need to face.
+    -- If you we have a search query that takes input dynamically, eg: we are fetching user details based on username from form.
+    -- For Injection:
+       insetead of sending the username, the field carrys a bunch of SQL queries that access the DB and may damage the database Entires.
+
+ Similarly, Mongo Injections are possible..
+   eg: db.users.find({username: req.body.name});  --> return the user details matching the name.
+   But if in name, we pass: {"$gt": ""}
+       db.users.find({username: {"$gt":""}});  -> find all users greater than nothing, Returns all the users from DB. [vunerability]
+
+ Solution: express-mongo-santize [npm package]
+   -- It removes any Prohibited characters like '$' and '.' that are sent as req query or params or body to the DB.
+   -- Simply import it and use it in the app. It filters out the Prohibited items.
+
+2) Cross-site Scripting (XSS): 
+   -- enables attackers to inject client side scripts into web pages viewed by the users.
+   -- This vunerability is famous and most frequently can be found in websites.
+   -- Cookies are by default availble under documents.cookies. It can be steal using JS script if not protected.
+   -- basically, scripts can be embeeded into the urls or links, that are injected in the user's webpage which steals data.
+   eg: Suppose you have an website up and running...
+   Now, hacker can have a url made, Where the url also contains <script>....</scripts> as query. This Script will run if you click on the link.
+        Once clicked, now the injected scripts runs in the users browser page and can pull senstive informations.
+   
+Situation: 
+   App has form inputs, Now anyone can put html tags OR scripts in that form Inputs, That can break the code. [example of XSS scripting]
+        -- Whenever we use ejs syntax <%= ... %>, This going to skip the html Characters. -> It converts the HTML tags into Enity codes.
+        -- But It doesn't protect the APP, If we insert something like: <script> alert('Hello') </script> in the from text input. [danagerous, This way hackers can access users cookies and session data]
+    Problem:
+        -- we are using JOI validator, It validates the input but doesn't sanitize the input. 
+        -- Possible Tool can be used: express-validator [npm package, similar like JOI, comes with sanitizer, Syntax are long and confusing].
+    Solution:
+        -- JOI, we will enhance to include santize the incoming HTML, It wont allow any html tags and most importantly not allow any scripts.
+        -- we can define extension on JOI on the JOI string type, defining custom rules for santizing the content.
+        -- ALso Needs a package: [sanitze-HTML]
+        -- Define a custom extention function to santise the String lebels, and throw error.
+
+3) Sessions and Cookies update:
+    Requirement for Cookies:
+        -- httpOnly: Cookies are accessable only by http, It cannot be accessable to Javascript.
+        -- secure: Cookies are available only for https. [NOTE: used in production, localhost is not secure.]
+        -- change the default name of express-session:
+           default-name: connect.sid
+
+4) Hide Stack Trace Errors:
+    -- Based on if the env is production or not we cna hide or show the error stack.
+    -- Well i am showing just the error message in both local and Production case.
+    -- The error stack will print in the server log.
+
+5) Helmet: [Ref: https://helmetjs.github.io/] [VIMP]
+    -- It provides security related middlewares for HTTP headers.
+    -- secure EXpress APP by setting HTTP response Header.
+    -- It comes with some 11 different middleware.
+    NOTE: The App will crash after installing helmet, All the external CDNs links and Images needs to have an attribute like: crossorigin = "anonymous"
+    -- Helmet will automatically add many security related response headers, makes any attack difficult.
+
+** Configuring Content security Policy (CSP):
+    -- It allows only those external url that we mention in the CSP directive configurations. Other External url it wont allow.
+    -- This Response header helps in mitigating more of cross-site scripting attack.
+    -- Basically, Using this policy we can allows website, which are the external sources are trusted and can be loaded to our application.
+    -- We need to mention all the external URLs that we are using and use it to configure the CSP.
+NOTE: If you using Bootstrap latest, We need to include "https://cdn.jsdelivr.net" to both allowed scripts and styleSheets.
