@@ -371,3 +371,31 @@ Situation:
     -- Basically, Using this policy we can allows website, which are the external sources are trusted and can be loaded to our application.
     -- We need to mention all the external URLs that we are using and use it to configure the CSP.
 NOTE: If you using Bootstrap latest, We need to include "https://cdn.jsdelivr.net" to both allowed scripts and styleSheets.
+
+*** DEployment Of the APP ***
+ 
+   Focus On:
+    -- Database we need to move from Local to cloud -> Mongo Atlas
+    -- We need to deploy the App on a server -> Using Heroku
+
+1) Setting up Mongo Atlas for Prod DB Setup
+   -- This is the same mongo DB that we use in local, but it is hosted on cloud.
+   -- It offers Data security, db visulaization and Used by a lot of people around the world.
+
+Project Updates: 
+   -- In ENV file, we added the cloud DB url and local DB url and a flag wether to use local or cloud DB ?
+
+2) Using Mongo for session Store.
+   -- mongo DB session store for connect and express
+   
+   why we do this ?
+   -- Currently the default place the session data is store is local memory store. We will move it to mongo store.
+   -- why not local memory store ? -> Its not persistence and not scaleable and Cannot work well in production env.
+
+   -- Basically, Express-session by default stores all session info to memeory-store.
+   -- Using mongo-store, we will move this session details to mongo.
+   -- defualt the session data will be cleared from mongo every 14 days. [configurable]
+   -- Lazy session updates -> On refresh of the page, Prevent unnecessary save of data. use the key, touchAfter[in seconds]
+      -- Basically, If nothing is changed in the session, No matter how many refresh we do, Session data will refresh after touchAfter time.
+      -- If any session data is refreshed then, the session will refresh no matter what is touchAfter time.
+

@@ -22,6 +22,8 @@ const LocalStrategy = require('passport-local');
 const mongoSanitize = require('express-mongo-sanitize');
 //HTTP response header Middleware for security
 const helmet = require("helmet");
+//moving the session-store to mongo
+const MongoStore = require('connect-mongo'); //Stores session info in Mongo DB
 
 
 //requiring custom files from the working directory
@@ -91,8 +93,35 @@ app.use(
     })
 );
 
+//Manage the Prod DB and local DB urls...
+
+const dbHostUrl = (process.env.IS_PROD_DB.toUpperCase() === "TRUE") ? process.env.MONGO_ATLAS_URL : process.env.MONGO_LOCAL_DB;
+
+console.log("Current DB HOST URL: ",dbHostUrl);
+
+//mongoose configurations...
+mongoose.connect(dbHostUrl)
+    .then(()=>{
+        console.log("Successfully connected to the MongoDB");
+    })
+    .catch(()=>{
+        console.log('error while connecting to the DB');
+    })
+
+//Mongo-store session configurrations...
+const store = MongoStore.create({
+    mongoUrl: dbHostUrl,
+    touchAfter: 24 * 60 * 60 //lazy session refresh will happen every 24 hours [in seconds]
+});
+
+//Handling any error occured with mongo session store...
+store.on("error", (err)=>{
+    console.log("Mongo-session store error occured", err);  
+})
+
 //enabling session
 app.use(session({
+    store, //using Mongo-store to store session data
     name: 'ExpSession',
     secret: 'ThisMySecretKeyForSessionSign',  //Required Parameter for session
     resave:false,
@@ -134,15 +163,6 @@ app.use((req,res,next)=>{
 
 //we will server the static public directory
 app.use(express.static(path.join(__dirname, 'public')));
-
-//mongoose configurations...
-mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp')
-    .then(()=>{
-        console.log("Successfully connected to the MongoDB");
-    })
-    .catch(()=>{
-        console.log('error while connecting to the DB');
-    })
 
 //basic Routes..
 app.get('/', (req,res)=>{
