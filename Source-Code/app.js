@@ -119,11 +119,13 @@ store.on("error", (err)=>{
     console.log("Mongo-session store error occured", err);  
 })
 
+//consfiguring session Secret token...
+const secret = process.env.SECRET || 'ThisMySecretKeyForSessionSign';
 //enabling session
 app.use(session({
     store, //using Mongo-store to store session data
     name: 'ExpSession',
-    secret: 'ThisMySecretKeyForSessionSign',  //Required Parameter for session
+    secret,  //Required Parameter for session
     resave:false,
     saveUninitialized:true,
     cookie: {
@@ -209,7 +211,10 @@ app.use((err, req, res, next)=>{
     res.status(statusCode).render('error.ejs', {err});
 })
 
+//configuring server port..
+const port = process.env.PORT || 8080;  //prod env will have the port, if not Server deployed at 8080
+
 //EXpress Server listening port configuration...
-app.listen(8080, ()=>{
-    console.log('Server Live at 8080 port');
+app.listen(port, ()=>{
+    console.log(`Server Live at ${port} !`);
 })

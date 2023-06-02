@@ -399,3 +399,31 @@ Project Updates:
       -- Basically, If nothing is changed in the session, No matter how many refresh we do, Session data will refresh after touchAfter time.
       -- If any session data is refreshed then, the session will refresh no matter what is touchAfter time.
 
+** Heroku Setup **
+
+    -- It will provide a platform for Our App to get deployed.
+    -- Need to install heroku CLI for running command Line for Configurations For the App Environment and setup.
+    -- Login to Heroku using heroku CLI.
+
+NOTE: Heroku Free tier is no longer available. We will use Render and try to Deploy the APP.
+
+** DEployment CheckNOTE **
+
+    -- Make Sure to Push all the changes to Git before deployment of the Application.
+    -- use .gitignore Folder in the project root dir to Exclude node_moudles and .env and Files you dont want in the Git Repo.
+       -- Git will stop tracking this Files..
+    -- Put all the Secret Keys and env variables to .env File.
+    -- Provide default value for the env variables. eg: const PORT = process.env.PORT || "3000" [If env has port it will take it else Server at 3000]
+    In the Package.json,
+       -- The App name all should always be lowercase.
+       -- Under script, add one Key like "start": "node app.js" -> npm start in console can trigger the build for the same.
+       -- For configuring the primary File: "main": "app.js" -> Primiary File that Will build the server.
+    -- Add the enviroment Variables to the Prod Server.
+    -- WhiteListing of IP for mongoAtlash Connection, Allow Mongo Connection Access from anywhere.
+       This will allow Production env to access the Mongo Atlash DB.
+    
+Check the DEployment logs and Try to debug the Server...
+
+
+ ************************** COngratulations APP is deployed **************************************************
+    
