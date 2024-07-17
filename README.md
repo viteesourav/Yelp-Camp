@@ -7,4 +7,4 @@ FrontEnd: HTML, CSS(Bootstrap), JS, EJS(used for template Engine)
 BackEnd: Node JS, Express, Mongoose, npm packages(used for schema validations, sessions, etc)
 DataBase: MongoDB
 
-Project Status: InProgress...
+Project Status: Completed
