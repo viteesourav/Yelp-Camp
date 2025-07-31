@@ -85,7 +85,6 @@ The project is deployed and live on Render.
   - Views: EJS templates and static assets
   - Controllers: Route logic and business rules
 
-
 ---
 
 ## 📦 Deployment
